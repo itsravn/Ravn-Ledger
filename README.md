@@ -1,55 +1,34 @@
-# Ravn-Ledger
+# 📒 Ravn-Ledger
 
-> **Financial grade economy system preventing duplication glitches.**
+![Java](https://img.shields.io/badge/Java-17%2B-ED8B00?style=for-the-badge&logo=openjdk&logoColor=white)
+![Security](https://img.shields.io/badge/Security-Audit%20Ready-green?style=for-the-badge&logo=shield&logoColor=white)
+![License](https://img.shields.io/badge/License-MIT-blue?style=for-the-badge)
 
-Ravn-Ledger is a high-precision, double-entry bookkeeping library designed for mission-critical economy handling. It eliminates floating-point errors and ensures transactional integrity through cryptographic hashing and immutable audit logs.
+> **"Trust, but verify."**
+> The standard for economic integrity in Minecraft networks.
 
-## Features
+**Ravn-Ledger** is a transactional middleware designed to eliminate economy glitches, duplication exploits, and race conditions. It implements **Double-Entry Bookkeeping** principles to ensure that every coin created or destroyed is cryptographically accounted for.
 
-### 🛡️ Precision Engineering
-- **CurrencyWrapper**: Built on `BigDecimal` with strict rounding modes (HALF_UP) and fixed scale (4 decimals) to prevent fractional lost.
-- **Floating-Point Free**: Zero tolerance for `double` or `float` imprecision in core logic.
+### 🛡️ Key Features
+* **Immutable Transactions:** Every transfer is hashed (SHA-256). Once recorded, logs cannot be silently altered.
+* **Async Auditing:** High-throughput logging system that doesn't block the main server thread.
+* **Race Condition Protection:** Atomic operations ensure money isn't lost during server lag or crashes.
+* **Fraud Detection:** (Experimental) Flags suspicious rapid-fire transactions automatically.
 
-### 🔒 Transaction Integrity
-- **Immutable Transactions**: Once created, a transaction cannot be altered.
-- **Cryptographic Hashing**: Every transaction is signed with a SHA-256 hash derived from its components (Sender, Receiver, Amount, Timestamp).
-- **Tamper Evidence**: Any modification to the transaction data invalidates the hash.
-
-### 📜 Comprehensive Auditing
-- **AuditLog System**: Interfaced logging system adaptable to Files, SQL, or NoSQL.
-- **Secure Persistence**: Default implementation writes secure, human-readable JSON records to flat-files.
-
-## Installation
-
-Add the dependency to your `pom.xml`:
-
-```xml
-<dependency>
-    <groupId>dev.ravn</groupId>
-    <artifactId>ravn-ledger</artifactId>
-    <version>1.0.0-SNAPSHOT</version>
-</dependency>
-```
-
-## Usage Example
-
+### 💻 API Usage
 ```java
-// Initialize the Audit Log
-AuditLog audit = new FileAuditLog("economy.log");
+// Create a secure transaction
+Transaction tx = Transaction.builder()
+    .from(playerA)
+    .to(playerB)
+    .amount(new BigDecimal("5000.00"))
+    .reason("AuctionHouse Sale")
+    .build();
 
-// Perform a secure transaction
-UUID merchant = UUID.randomUUID();
-UUID customer = UUID.randomUUID();
-CurrencyWrapper price = CurrencyWrapper.of(2500.00);
-
-Transaction tx = new Transaction(customer, merchant, price);
-
-// Verify integrity before processing
-if (tx.verifyHash()) {
-    audit.log(tx);
-    System.out.println("Transaction finalized: " + tx.getHash());
-}
-```
-
----
-*Built for precision. Engineered for trust.*
+// Process with ACID guarantees
+RavnLedger.getService().process(tx)
+    .thenAccept(result -> {
+        if (result.isSuccess()) {
+            System.out.println("Transaction Hash: " + result.getHash());
+        }
+    });
